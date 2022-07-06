@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户界面</title>
+    <!-- 引入Jquery -->
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.min.js"></script>
+    <!-- 引入bootstrap -->
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <!-- 引入css-->
+    <link rel="stylesheet" type="text/css" href="/static/css/UserInterface.css" >
+    <!-- 引入时间选择器-->
+    <script src="/static/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="/static/dist/locales/bootstrap-datepicker.zh-CN.min.js" charset="UTF-8"></script>
+    <link rel="stylesheet" href="/static/dist/css/bootstrap-datepicker3.min.css">
+    <!-- 引入地址选择器-->
+    <script src="/static/address-selector/lib/bootstrap-chinese-region/bootstrap-chinese-region.js"></script>
+    <link rel="stylesheet" href="/static/address-selector/lib/bootstrap-chinese-region/bootstrap-chinese-region.css">
+</head>
+<body>
+    <!--    复用新增用户模态框-->
+    <div th:replace="/AdminInterface :: #member_model"></div>
+    <!--    修改密码模态框-->
+    <div class="modal fade" id="update_password_model" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">修改密码</h4>
+                </div>
+                <!-- 表单 -->
+                <div class="modal-body">
+                    <form th:action="@{/user/updatePassword}" id="update_password_form" class="form-horizontal" method="post">
+                        <!-- old_password -->
+                        <input name="uname" type="hidden" th:value="${userUname}">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">旧密码</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="password" name="oldPassword" class="form-control" id="old_password" placeholder="oldPassword">
+                                    <span class="input-group-addon"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- new_password -->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">新密码</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="password" name="password" class="form-control" id="new_password" placeholder="newPassword">
+                                    <span class="input-group-addon"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- repeat_new_password -->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">确认新密码</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="password" name="repeatPassword" class="form-control" id="repeat_new_password" placeholder="repeatNewPassword">
+                                    <span class="input-group-addon"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="save_password" th:onclick="submit_password()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    标头-->
+    <div class="page-header">
+        <!--    标题-->
+        <div class="title-row row">
+            <div class="h1-parent col-md-6">
+                <h1>&nbsp;Welcome to chat room <small>&nbsp;Hello [[${param.uname}]]</small></h1>
+            </div>
+            <div class="btn-group-parent col-md-2 col-md-offset-4">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info">账号管理</button>
+                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a th:onclick="add_update_password_Model()">修改密码</a></li>
+                        <li><a th:href="@{/Register}">注册账号</a></li>
+                        <li><a th:href="@{/Login}">退出登录</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a th:onclick="if(!(confirm('确认注销该账号'))) return false" th:href="@{/user/deleteUser/{uname}(uname=${userUname})}">注销</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    个人信息-->
+    <div class="col-md-2 panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">个人信息</h3>
+        </div>
+        <div id="memberInfo" class="panel-body">
+            <ul class="list-group">
+                <li class="list-group-item">昵称：<span id="chatFromUser" th:if="${not #strings.isEmpty(info)}">[[${info.mName}]]</span></li>
+                <li class="list-group-item">性别：<span th:if="${not #strings.isEmpty(info)}">[[${info.mSex}]]</span></li>
+                <li class="list-group-item">出生年月：<span th:if="${not #strings.isEmpty(info)}">[[${info.birthday}]]</span></li>
+                <li class="list-group-item">家庭地址：<span th:if="${not #strings.isEmpty(info)}">[[${info.address}]]</span></li>
+                <li class="list-group-item">联系电话：<span th:if="${not #strings.isEmpty(info)}">[[${info.phoneNumber}]]</span></li>
+                <li class="list-group-item">邮箱：<span th:if="${not #strings.isEmpty(info)}">[[${info.email}]]</span></li><br>
+                <button type="button" class="btn btn-info" id="member_info_button" th:onclick="addModel([[${info}]], [[${param.uname}]])"></button>
+                <button type="button" class="btn btn-warning" id="group_chat_button" th:onclick="beginChat([[${'共享群聊'}]])">共享聊天</button>
+            </ul>
+        </div>
+    </div>
+    <!--    聊天框-->
+    <div class="col-md-8 panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">聊天框</h3>
+        </div>
+        <div id="chat" class="panel-body">
+            <!--    聊天内容-->
+            <div class="chatInfo-parent col-md-10 panel panel-info">
+                <div id="chatInfo" class="panel-body">
+                    <!--    聊天对象显示-->
+                    <p class="chatInfo-p-block"></p>
+                    <p class="chatInfo-p"></p>
+                </div>
+            </div>
+            <!--    在线人员-->
+            <div class="onLineMember-parent col-md-2 panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">在线人员</h3>
+                </div>
+                <div id="onLineMember" class="panel-body">
+                    <div id="onLineMemberList" class="list-group"></div>
+                </div>
+            </div>
+            <!--    输入框-->
+            <div class="editText-parent">
+                <textarea id="editText"></textarea>
+                <button style="display: none" type="button" class="btn btn-info" id="submit_chatInfo" th:onclick="send()">发送</button>
+            </div>
+        </div>
+    </div>
+    <!--    好友列表-->
+    <div class="col-md-2 panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">好友列表</h3>
+        </div>
+        <div id="allMember" class="panel-body">
+            <div th:each="member, stat:${members}" class="allMember-name panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <a role="button" data-toggle="collapse" data-parent="#accordion" th:href="'#' + ${member.mid}" aria-expanded="false" aria-controls="collapseOne">
+                            [[${member.MName}]]
+                        </a>
+                    </div>
+                    <div th:id="${member.mid}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                        <ul class="list-group">
+                            <li class="list-group-item">昵称：<span th:if="${not #strings.isEmpty(members)}">[[${member.MName}]]</span></li>
+                            <li class="list-group-item">性别：<span th:if="${not #strings.isEmpty(members)}">[[${member.MSex}]]</span></li>
+                            <li class="list-group-item">出生年月：<span th:if="${not #strings.isEmpty(members)}">[[${member.birthday}]]</span></li>
+                            <li class="list-group-item">家庭地址：<span th:if="${not #strings.isEmpty(members)}">[[${member.address}]]</span></li>
+                            <li class="list-group-item">联系电话：<span th:if="${not #strings.isEmpty(members)}">[[${member.phoneNumber}]]</span></li>
+                            <li class="list-group-item">邮箱：<span th:if="${not #strings.isEmpty(members)}">[[${member.email}]]</span></li><br>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">This project is completed by team 316. It is forbidden to reprint without authorization</div>
+
+    <script th:inline="javascript">
+
+        var websocket = '';
+        var chatFromUser = $("#chatFromUser").text();
+        var chatToUser = '';
+
+        $(function(){
+            if([[${info}]] !== null) {
+                $("#member_info_button").text("修改个人信息");
+            } else $("#member_info_button").text("完善个人信息");
+        });
+
+        if (window.WebSocket) {
+            websocket = new WebSocket("ws://localhost:8080/chatServer/" + chatFromUser);
+            websocket.onopen = function() {
+                console.log("服务已连接");
+            }
+            //浏览器端收到服务器发来的消息
+            websocket.onmessage = function(message) {
+                var memberList = "";
+                var jsonMsg = JSON.parse(message.data);
+                //系统消息
+                if (jsonMsg.isSystem) {
+                    if (jsonMsg.members != null) {
+                        var jsonMembers = jsonMsg.members;
+                        for (var jsonMember of jsonMembers) {
+                            if (jsonMember.member != chatFromUser) {
+                                memberList += "<button id=\"chatToUser\" type=\"button\" class=\"list-group-item\" onclick='beginChat(\"" + jsonMember.member + "\")'>" + jsonMember.member + "</button>";
+                            }
+                        }
+                    //渲染在线人员
+                    $("#onLineMemberList").html(memberList);
+                    }
+                    //群聊
+                    if (jsonMsg.from != null && jsonMsg.text != null) {
+                        beginChat('共享群聊');
+                        var toChatLog = "<div class=\"user-all left-user\">\n" +
+                            "                        <div class=\"group_member group_member_left\"><span>" + jsonMsg.from + "</span></div>\n" +
+                            "                        <div class=\"tip tip-left\"><span>" + jsonMsg.text + "</span></div>\n" +
+                            "                        <div class=\"tip-triangle tip-triangle-left\"></div>\n" +
+                            "                        <img class=\"head-left\" src=\"../static/page/user-left.png\">\n" +
+                            "                    </div>";
+                        if (chatToUser == '共享群聊' && jsonMsg.from != chatFromUser) {
+                            $("#chatInfo").append(toChatLog);
+                        }
+                        var chatHistory = sessionStorage.getItem(chatToUser);
+                        if (chatHistory != null) {
+                            toChatLog = chatHistory + toChatLog;
+                        }
+                        if (jsonMsg.from != chatFromUser) {
+                            sessionStorage.setItem('共享群聊', toChatLog);
+                        }
+                        //滚动条滚动到聊天框底端
+                        $("#chatInfo").scrollTop($("#chatInfo").prop('scrollHeight'));
+                    }
+                } else {
+                    beginChat(jsonMsg.from);
+                    var toChatLog = "<div class=\"user-all left-user\">\n" +
+                        "                        <div class=\"group_member group_member_left\"><span>" + jsonMsg.from + "</span></div>\n" +
+                        "                        <div class=\"tip tip-left\"><span>" + jsonMsg.text + "</span></div>\n" +
+                        "                        <div class=\"tip-triangle tip-triangle-left\"></div>\n" +
+                        "                        <img class=\"head-left\" src=\"../static/page/user-left.png\">\n" +
+                        "                    </div>";
+                    if (chatToUser == jsonMsg.from) {
+                        $("#chatInfo").append(toChatLog);
+                    }
+                    var chatHistory = sessionStorage.getItem(jsonMsg.from);
+                    if (chatHistory != null) {
+                        toChatLog = chatHistory + toChatLog;
+                    }
+                    sessionStorage.setItem(chatToUser, toChatLog);
+                    //滚动条滚动到聊天框底端
+                    $("#chatInfo").scrollTop($("#chatInfo").prop('scrollHeight'));
+                }
+            }
+            websocket.onclose = function() {
+                console.log("服务已关闭");
+            }
+            websocket.onerror = function() {
+                console.log("连接发生错误");
+            }
+        } else {
+            console.log("您的浏览器不支持websocket");
+        }
+
+        // 客户端向服务端发送消息
+        function send() {
+            var text = $("#editText").val();
+            var message;
+            if (text !== '' && chatToUser !== '') {
+                message = {
+                    "information": text,
+                    "toUser": chatToUser
+                }
+                //发送消息到服务端
+                websocket.send(JSON.stringify(message));
+                // 渲染发消息者的聊天内容
+                $("#editText").val("");
+                if (chatToUser == '共享群聊') beginChat(chatToUser);
+                var fromChatLog = "<div class=\"user-all right-user\">\n" +
+                    "                        <div class=\"group_member group_member_right\"><span>" + chatFromUser + "</span></div>\n" +
+                    "                        <div class=\"tip tip-right\"><span>" + text + "</span></div>\n" +
+                    "                        <div class=\"tip-triangle tip-triangle-right\"></div>\n" +
+                    "                        <img class=\"head-right\" src=\"../static/page/user-right.png\">\n" +
+                    "                    </div>";
+                $("#chatInfo").append(fromChatLog);
+                var chatHistory = sessionStorage.getItem(chatToUser);
+                if (chatHistory != null) {
+                    fromChatLog = chatHistory + fromChatLog;
+                }
+                sessionStorage.setItem(chatToUser, fromChatLog);
+                //滚动条滚动到聊天框底端
+                $("#chatInfo").scrollTop($("#chatInfo").prop('scrollHeight'));
+            }
+        }
+
+        // 点击在线人员展开聊天框
+        function beginChat(toUser) {
+            $("#chatInfo").html("");
+            $("#chatInfo").append("<p class='chatInfo-p-block'></p>");
+            $("#chatInfo").append("<p class='chatInfo-p'></p>");
+            $(".chatInfo-parent").css("border", "2px solid #bce8f1");
+            $("#submit_chatInfo").css("display", "inline");
+            $("#chatInfo").children(".chatInfo-p").html(toUser);
+            $("#editText").attr("placeholder", "请在此输入消息...");
+            chatToUser = toUser;
+            //渲染聊天记录
+            var chatHistory = sessionStorage.getItem(toUser);
+            if(chatHistory != null) {
+                $("#chatInfo").append(chatHistory);
+                $("#chatInfo").scrollTop($("#chatInfo").prop('scrollHeight'));
+            }
+        }
+
+        //按下回车时发送消息
+        document.onkeydown = function () {
+            if (event.keyCode === 13 && $("#submit_chatInfo").css("display") !== "none") {
+                event.returnValue = false;
+                $("#submit_chatInfo").click();
+            }
+        }
+
+        //点击完善个人信息弹出模态框
+        function addModel(info, uname) {
+            //表单重置，清空表单数据
+            $("#member_model form")[0].reset();
+            //清空校验提示
+            $("#member_mName").parent().removeClass("has-success has-error")
+            $("#member_mName").next("span").text("");
+            $("#member_email").parent().removeClass("has-success has-error")
+            $("#member_email").next("span").text("");
+            $("#member_phoneNumber").parent().removeClass("has-success has-error")
+            $("#member_phoneNumber").next("span").text("");
+            if (info == null) {
+                $("#member_model h4").html("完善个人信息");
+                $("#member_model form").attr("action", "/chat/insertInfo?uname=" + uname);
+            } else {
+                $("#member_model h4").html("修改个人信息");
+                $("#member_mName").val(info.mname);
+                $("#member_birthday").val(info.birthday);
+                info.msex === "男"? $("#member_sex1").prop("checked", true): $("#member_sex2").prop("checked", true);
+                $("#address").val(info.address);
+                $("#member_phoneNumber").val(info.phoneNumber);
+                $("#member_email").val(info.email);
+                $("#member_model form").attr("action", "/chat/updateInfo?mid=" + info.mid + "&uname=" + uname);
+            }
+            $("#member_model").modal({
+                backdrop: "static"
+            })
+            if ($("#member_mName").val() == '' || $("#member_email").val() == '' || $("#member_phoneNumber").val() == '' || $("#member_birthday").val() == '' || $("#address").val() == '') $("#save_member").attr("disabled", "disabled");
+        }
+
+        //弹出修改密码模态框
+        function add_update_password_Model() {
+            //表单重置，清空表单数据
+            $("#update_password_model form")[0].reset();
+            //清空校验提示
+            $("#old_password").parent().removeClass("has-success has-error")
+            $("#old_password").next("span").text("");
+            $("#new_password").parent().removeClass("has-success has-error")
+            $("#new_password").next("span").text("");
+            $("#repeat_new_password").parent().removeClass("has-success has-error")
+            $("#repeat_new_password").next("span").text("");
+            $("#update_password_model").modal({
+                backdrop: "static"
+            })
+            if ($("#old_password").val() == '' || $("#new_password").val() == '' || $("#repeat_new_password").val() == '') $("#save_password").attr("disabled", "disabled");
+        }
+
+        //完善个人信息
+        function submit_Member() {
+            document.getElementById("submit_member_form").submit();
+        }
+
+        //修改密码
+        function submit_password() {
+            document.getElementById("update_password_form").submit();
+        }
+
+        //开启时间选择器
+        $("#sandbox-container .input-group.date").datepicker({
+            language: "zh-CN"
+        })
+
+        //调入地址选择器
+        $.getJSON('/static/address-selector/lib/bootstrap-chinese-region/sql_areas.json', function(data){
+            // 重定义数据结构，id：键，name：名字，level：层级，parentId：父级
+            for (var i = 0; i < data.length; i++) {
+                var area = {id: data[i].id, name: data[i].cname, level: data[i].level, parentId: data[i].upid};
+                data[i] = area;
+            }
+            //导入数据并实例化
+            $('.bs-chinese-region').chineseRegion('source', data);
+        });
+
+        //对表单的数据进行校验
+        //检验用户名是否可用
+        function check_form_name(ele) {
+            var member_name = $(ele).val();
+            var check_name = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u4e00-\u9fa5]{2,5})/;
+            if (!check_name.test(member_name)) {
+                inspection_status(ele, "error", "中文或6-16位的英文数字");
+                return false;
+            } else {
+                inspection_status(ele, "success", "√");
+                return true;
+            }
+        }
+        //校验邮箱是否可用
+        function check_form_email(ele) {
+            var member_email = $(ele).val();
+            var check_email = /^([a-zA-Z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+            if (!check_email.test(member_email)) {
+                inspection_status(ele, "error", "邮箱格式不正确");
+                return false;
+            } else {
+                inspection_status(ele, "success", "√");
+                return true;
+            }
+        }
+        //校验手机号是否可用
+        function check_form_phoneNumber(ele) {
+            var member_phoneNumber = $(ele).val();
+            var check_phoneNumber = /^1[0-9]{10}$/;
+            if (!check_phoneNumber.test(member_phoneNumber)) {
+                inspection_status(ele, "error", "手机号格式不正确");
+                return false;
+            } else {
+                inspection_status(ele, "success", "√");
+                return true;
+            }
+        }
+        //校验旧密码是否正确
+        function check_old_password(ele) {
+            var now_old_password = $(ele).val();
+            var primary_old_password = [[${oldPassword}]];
+            if (now_old_password !== primary_old_password) {
+                inspection_status(ele, "error", "旧密码错误");
+                return false;
+            } else {
+                inspection_status(ele, "success", "√");
+                return true;
+            }
+        }
+        //校验新密码是否符合要求
+        function check_new_password(ele) {
+            var new_password = $(ele).val();
+            var check_password = /^[0-9]{6,12}$/;
+            if (!check_password.test(new_password)) {
+                inspection_status(ele, "error", "密码由6-12位数字组成");
+                return false;
+            } else {
+                inspection_status(ele, "success", "√");
+                return true;
+            }
+        }
+        //校验重复新密码是否正确
+        function check_repeat_new_password(ele) {
+            var repeat_new_password = $(ele).val();
+            var new_password = $("#new_password").val();
+            if (repeat_new_password !== new_password) {
+                inspection_status(ele, "error", "新密码错误");
+                return false;
+            } else {
+                inspection_status(ele, "success", "√");
+                return true;
+            }
+        }
+        //检验结果状态显示
+        function inspection_status(element, status, text) {
+            //清楚当前元素的检验状态
+            $(element).parent().removeClass("has-error has-success");
+            $(element).next("span").text("")
+            if ("success" == status) {
+                $(element).parent().addClass("has-success");
+                $(element).next("span").text(text);
+                if ($("#old_password").val() !== '' && $("#new_password").val() !== '' && $("#repeat_new_password").val() !== '') $("#save_password").removeAttr("disabled", "disabled");
+                if ($("#member_mName").val() !== '' && $("#member_email").val() !== '' && $("#member_phoneNumber").val() !== '' && $("#member_birthday").val() !== '' && $("#address").val() !== '') $("#save_member").removeAttr("disabled", "disabled");
+            } else if("error" == status) {
+                $(element).parent().addClass("has-error");
+                $(element).next("span").text(text);
+                $("#save_member").attr("disabled", "disabled");
+                $("#save_password").attr("disabled", "disabled");
+            }
+        }
+        //输入框失去焦点时进行校验
+        $("#member_mName").blur(function() {
+            check_form_name("#member_mName");
+        })
+        $("#member_email").blur(function() {
+            check_form_email("#member_email");
+        })
+        $("#member_phoneNumber").blur(function() {
+            check_form_phoneNumber("#member_phoneNumber");
+        })
+        $("#old_password").blur(function() {
+            check_old_password("#old_password");
+        })
+        $("#new_password").blur(function() {
+            check_new_password("#new_password");
+        })
+        $("#repeat_new_password").blur(function() {
+            check_repeat_new_password("#repeat_new_password");
+        })
+    </script>
+</body>
+</html>

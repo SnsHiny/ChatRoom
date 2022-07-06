@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../HotelStaffManagementSystem/SnHI_SSM_CRUD.iml" filepath="$PROJECT_DIR$/../HotelStaffManagementSystem/SnHI_SSM_CRUD.iml" />
+      <module fileurl="file://$PROJECT_DIR$/chat_room.iml" filepath="$PROJECT_DIR$/chat_room.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SnHI_SpringBoot_Data/springboot_data.iml" filepath="$PROJECT_DIR$/../SnHI_SpringBoot_Data/springboot_data.iml" />
+    </modules>
+  </component>
+</project>

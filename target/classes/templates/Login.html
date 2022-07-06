@@ -1,0 +1,56 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>海琴烟聊天室管理登录页面</title>
+    <!-- 引入Jquery -->
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.min.js"></script>
+    <!-- 引入css样式 -->
+    <link rel="stylesheet" type="text/css" href="/static/css/Login.css" >
+</head>
+<body>
+<!-- 首页页面 -->
+<div id="main">
+    <div id="transparent">
+        <p>欢迎来到海琴烟聊天室</p>
+    </div>
+    <div id="login">
+        <p class="title">用户登录</p>
+        <form th:action="@{/user/identityCheck}" method="post">
+            <p class="tit">用户名</p><input class="uname txt" name="uname" type="text"><br>
+            <p class="tit">密码</p><input class="password txt" name="password" type="password"><br>
+            <div class="person">
+                <p class="tit">身份</p>
+                <input class="tit-value uType" name="uType" type="radio" value="用户">用户
+                <input class="tit-value uType" name="uType" type="radio" value="管理员">管理员
+            </div><br>
+            <span class="msg" th:text="${msg}"></span>
+            <input class="bottom" name="enroll" type="submit" value="登录" id="index"><br>
+        </form>
+        <div class="register-bottom bottom">
+            <a th:href="@{/Register}">注册</a>
+        </div>
+        <a class="forget_password" th:href="@{/FindPassword}">忘记密码？</a>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // 点击登录响应
+    $("#index").click(function() {
+        //检测标签内容是否为空
+        if($(".uname").val() === "") {
+            alert("用户名不能为空")
+            $(".uname").focus()
+            return false
+        }
+        if($(".password").val() === "") {
+            alert("请输入密码")
+            $(".password").focus()
+            return false
+        }
+        if($('input:radio[name="uType"]:checked').val() == null) {
+            alert("请选择身份登录")
+            return false
+        }
+    })
+</script>
+</body>
+</html>

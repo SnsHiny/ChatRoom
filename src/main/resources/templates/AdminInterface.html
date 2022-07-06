@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <!-- 引入Jquery -->
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.min.js"></script>
+    <!-- 引入bootstrap -->
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <!-- 引入时间选择器-->
+    <script src="/static/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="/static/dist/locales/bootstrap-datepicker.zh-CN.min.js" charset="UTF-8"></script>
+    <link rel="stylesheet" href="/static/dist/css/bootstrap-datepicker3.min.css">
+    <!-- 引入地址选择器-->
+    <script src="/static/address-selector/lib/bootstrap-chinese-region/bootstrap-chinese-region.js"></script>
+    <link rel="stylesheet" href="/static/address-selector/lib/bootstrap-chinese-region/bootstrap-chinese-region.css">
+    <title>管理员界面</title>
+</head>
+<body>
+
+<!-- 新增用户数据的模态框 -->
+<div class="modal fade" id="member_model" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="save_model">新增用户数据</h4>
+            </div>
+            <!-- 表单 -->
+            <div class="modal-body">
+                <form th:action="@{/member/saveMember}" id="submit_member_form" class="form-horizontal" method="post">
+                    <!-- Name -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Name</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="text" name="mName" class="form-control" id="member_mName" placeholder="mName">
+                                <span class="input-group-addon"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- sex -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">sex</label>
+                        <div class="col-sm-10">
+                            <label class="radio-inline">
+                                <input type="radio" name="mSex" id="member_sex1" value="男" checked="checked"> 男
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="mSex" id="member_sex2" value="女"> 女
+                            </label>
+                        </div>
+                    </div>
+                    <!-- birthday -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">birthday</label>
+                        <div class="col-sm-10" id="sandbox-container">
+                            <div class="input-group date">
+                                <input type="text" name="birthday" class="form-control" id="member_birthday" placeholder="birthday">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- address -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">address</label>
+                        <div class="col-sm-10 bs-chinese-region flat dropdown" data-submit-type="id" data-min-level="1" data-max-level="3">
+                            <input type="text" class="form-control" name="address" id="address" placeholder="address" data-toggle="dropdown" value="">
+                            <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <div>
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li role="presentation" class="active"><a href="#province" data-next="city" role="tab" data-toggle="tab">省份</a></li>
+                                        <li role="presentation"><a href="#city" data-next="district" role="tab" data-toggle="tab">城市</a></li>
+                                        <li role="presentation"><a href="#district" data-next="street" role="tab" data-toggle="tab">县区</a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active" id="province">--</div>
+                                        <div role="tabpanel" class="tab-pane" id="city">--</div>
+                                        <div role="tabpanel" class="tab-pane" id="district">--</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- phoneNumber -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">phoneNumber</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="text" name="phoneNumber" class="form-control" id="member_phoneNumber" placeholder="phoneNumber">
+                                <span class="input-group-addon"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Email</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="text" name="Email" class="form-control" id="member_email" placeholder="Email">
+                                <span class="input-group-addon"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="save_member" th:onclick="|submit_Member()|">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 标头 -->
+<div class="jumbotron">
+    <!--警告框-->
+    <div th:if="${not #strings.isEmpty(errors)}" class="alert alert-danger alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong>Oh snap!</strong> Data does not meet requirements. insert or update failed!
+    </div>
+    <div class="container">
+        <h3>聊天室用户信息管理<small><span id="uname"></span></small></h3>
+        <p>Dear administrator, all user information is displayed below. You can choose to add, delete and batch delete functions to manage user information. Please make reasonable use of your rights. Thanks.</p>
+        <p><nav>
+            <ul class="pager">
+                <li class="previous"><a th:href="@{/Login}"><span aria-hidden="true">&larr;</span> 退出登录</a></li>
+            </ul>
+        </nav></p>
+    </div>
+</div>
+
+<!-- 主体 -->
+<div class="container">
+    <!-- 按钮 -->
+    <div class="row">
+        <div class="col-md-2 col-md-offset-10">
+            <a type="button" class="btn btn-primary" id="member_model_button" th:onclick="addModel([[${'insert'}]])">新增</a>
+            <a type="button" class="btn btn-danger" id="member_model_delete" th:onclick="|delete_Members()|">删除</a>
+        </div>
+    </div>
+    <div class="row">&nbsp;</div>
+    <!-- 表格 -->
+    <div class="row">
+        <table id="memberTable" class="table table-hover">
+            <form id="members_form" th:action="@{/member/deleteBatch}" method="post">
+                <thead>
+                <tr>
+                    <th><input id="check_all" type="checkbox"></th>
+                    <th>ID</th>
+                    <th>mName</th>
+                    <th>mSex</th>
+                    <th>birthday</th>
+                    <th>address</th>
+                    <th>phoneNumber</th>
+                    <th>Email</th>
+                    <th>&nbsp; &nbsp; 操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="member, stat:${page.records}">
+                    <td><input class='check_item' name="members" type='checkbox' th:value="${member.mid}"></td>
+                    <input name="pn" type='hidden' th:value="${page.current}">
+                    <td th:text="${member.mid}"></td>
+                    <td th:text="${member.MName}"></td>
+                    <td th:text="${member.MSex}"></td>
+                    <td th:text="${member.birthday}"></td>
+                    <td th:text="${member.address}"></td>
+                    <td th:text="${member.phoneNumber}"></td>
+                    <td th:text="${member.email}"></td>
+                    <td>
+                        <a th:onclick="addModel([[${'update'}]], [[${member}]], [[${page}]])" type="button" class="btn btn-warning">编辑</a>
+                        <a th:href="@{/member/deleteById/{mid}(mid=${member.mid}, pn=${page.current})}" th:onclick="if(!(confirm('确认删除' + '\'[[${member.MName}]]\'' + '用户数据'))) return false" type="button" class="btn btn-danger">删除</a>
+                    </td>
+                </tr>
+                </tbody>
+            </form>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="row">
+        <!-- 分页详情 -->
+        <div id="page-info" class="col-md-7">
+            当前第[[${page.current}]]页，共[[${page.getPages}]]页，共[[${page.total}]]条记录数
+        </div>
+        <!-- 分页栏 -->
+        <div id="page-nav" class="col-md-5">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li th:class="${!page.hasPrevious()? 'disabled': 'prev'}">
+                        <a th:href="@{/member/selectMember(pn=${1})}"><span aria-hidden="true">首页</span></a>
+                    </li>
+                    <li th:class="${!page.hasPrevious()? 'disabled': 'prev'}">
+                        <a th:href="@{/member/selectMember(pn=${page.current - 1})}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li th:class="${page.current == num ? 'active': ''}" th:each="num:${#numbers.sequence((page.current < 3? 1: (page.current + 2 > page.getPages()? page.getPages() - 4: page.current - 2)), (page.current < 3? 5: (page.current + 2 > page.getPages()? page.getPages(): page.current + 2)))}"><a th:href="@{/member/selectMember(pn=${num})}">[[${num}]]</a></li>
+                    <li th:class="${!page.hasNext()? 'disabled': 'next'}">
+                        <a th:href="@{/member/selectMember(pn=${page.current + 1})}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li th:class="${!page.hasNext()? 'disabled': 'next'}">
+                        <a th:href="@{/member/selectMember(pn=${page.getPages()})}"><span aria-hidden="true">尾页</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+
+    //调用模态框
+    function addModel(method_type, member, page) {
+        //表单重置，清空表单数据
+        $("#member_model form")[0].reset();
+        //清空校验提示
+        $("#member_mName").parent().removeClass("has-success has-error")
+        $("#member_mName").next("span").text("");
+        $("#member_email").parent().removeClass("has-success has-error")
+        $("#member_email").next("span").text("");
+        $("#member_phoneNumber").parent().removeClass("has-success has-error")
+        $("#member_phoneNumber").next("span").text("");
+        //弹出新增用户信息模态框
+        if (method_type === 'insert') {
+            $("#member_model h4").html("新增用户数据");
+            $("#member_model form").attr("action", "/member/saveMember");
+        //弹出编辑用户信息模态框
+        } else if (method_type === 'update') {
+            //修改model相关信息
+            $("#member_model form").attr("action", "/member/updateMember?mid=" + member.mid + "&pn=" + page.current);
+            $("#member_model h4").html("修改用户数据");
+            $("#member_mName").val(member.mname);
+            $("#member_birthday").val(member.birthday);
+            member.msex === "男"? $("#member_sex1").prop("checked", true): $("#member_sex2").prop("checked", true);
+            $("#address").val(member.address);
+            $("#member_phoneNumber").val(member.phoneNumber);
+            $("#member_email").val(member.email);
+        }
+        //弹出模态框
+        $("#member_model").modal({
+            //点击模态框外的内容，模态框不会消失
+            backdrop: "static"
+        })
+    }
+
+    //新增用户数据
+    function submit_Member() {
+        document.getElementById("submit_member_form").submit();
+    }
+
+    //批量删除用户数据
+    function delete_Members() {
+        var delete_names = "";
+        //遍历选中的check_item
+        $.each($(".check_item:checked"), function() {
+            //获取所有选中要删除的员工姓名
+            delete_names += "【" + $(this).parents("tr").find("td:eq(2)").text() + "】";
+        })
+        if (delete_names == "") alert("请选择要删除的数据")
+        if (delete_names != "" && confirm("确认删除" + delete_names + "用户数据")) {
+            document.getElementById("members_form").submit();
+        }
+    }
+
+    //复选框全选功能
+    $("#check_all").click(function() {
+        //attr获取自定义属性；prop获取dom原生的属性
+        //将所有check_item的checked属性设置为check_all的checked属性值
+        $(".check_item").prop("checked", $("#check_all").prop("checked"));
+    })
+
+    //复选框全不选功能
+    $(document).on("click", ".check_item", function() {
+        //判断当前选中的check_item个数是否等于一页中所有的item个数，是则选中check_all
+        $("#check_all").prop("checked", $(".check_item:checked").length == $(".check_item").length);
+    })
+
+    //开启时间选择器
+    $("#sandbox-container .input-group.date").datepicker({
+        language: "zh-CN"
+    })
+
+    //调入地址选择器
+    $.getJSON('/static/address-selector/lib/bootstrap-chinese-region/sql_areas.json', function(data){
+        // 重定义数据结构，id：键，name：名字，level：层级，parentId：父级
+        for (var i = 0; i < data.length; i++) {
+            var area = {id: data[i].id, name: data[i].cname, level: data[i].level, parentId: data[i].upid};
+            data[i] = area;
+        }
+        //导入数据并实例化
+        $('.bs-chinese-region').chineseRegion('source', data);
+    });
+
+    //对表单的数据进行校验
+    //检验用户名是否可用
+    function check_form_name(ele) {
+        var member_name = $(ele).val();
+        var check_name = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u4e00-\u9fa5]{2,5})/;
+        if (!check_name.test(member_name)) {
+            inspection_status(ele, "error", "中文或6-16位的英文数字");
+            return false;
+        } else {
+            inspection_status(ele, "success", "√");
+            return true;
+        }
+    }
+    //校验邮箱是否可用
+    function check_form_email(ele) {
+        var member_email = $(ele).val();
+        var check_email = /^([a-zA-Z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+        if (!check_email.test(member_email)) {
+            inspection_status(ele, "error", "邮箱格式不正确");
+            return false;
+        } else {
+            inspection_status(ele, "success", "√");
+            return true;
+        }
+    }
+    //校验手机号是否可用
+    function check_form_phoneNumber(ele) {
+        var member_phoneNumber = $(ele).val();
+        var check_phoneNumber = /^1[0-9]{10}$/;
+        if (!check_phoneNumber.test(member_phoneNumber)) {
+            inspection_status(ele, "error", "手机号格式不正确");
+            return false;
+        } else {
+            inspection_status(ele, "success", "√");
+            return true;
+        }
+    }
+    //检验结果状态显示
+    function inspection_status(element, status, text) {
+        //清楚当前元素的检验状态
+        $(element).parent().removeClass("has-error has-success");
+        $(element).next("span").text("")
+        if ("success" == status) {
+            $(element).parent().addClass("has-success");
+            $(element).next("span").text(text);
+        } else if("error" == status) {
+            $(element).parent().addClass("has-error");
+            $(element).next("span").text(text);
+        }
+    }
+    //输入框失去焦点时进行校验
+    $("#member_mName").blur(function() {
+        check_form_name("#member_mName");
+    })
+    $("#member_email").blur(function() {
+        check_form_email("#member_email");
+    })
+    $("#member_phoneNumber").blur(function() {
+        check_form_phoneNumber("#member_phoneNumber");
+    })
+</script>
+</body>
+</html>

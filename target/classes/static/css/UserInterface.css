@@ -1,0 +1,235 @@
+@charset "UTF-8";
+
+#memberInfo {
+    height: 540px;
+    padding: 0px;
+}
+
+#chat {
+    height: 540px;
+    padding: 0px;
+    position: relative;
+}
+
+#allMember {
+    height: 540px;
+    overflow: auto;
+}
+
+#onLineMemberList {
+    margin-bottom: 0px;
+}
+
+#onLineMemberList button {
+    width: 168.8px;
+    margin: -2px;
+    border: 2px solid #bce8f1;
+}
+
+#chatInfo {
+    overflow: auto;
+    height: 376px;
+}
+
+#onLineMember {
+    overflow: auto;
+    height: 338px;
+}
+
+#chatInfo .chatInfo-p {
+    text-align: center;
+    font-size: 20px;
+    color: #25CCF7;
+    position:fixed;
+    top:130px;
+    left: 640px;
+    z-index:1;
+}
+
+.chatInfo-p-block {
+    margin-bottom: 40px;
+}
+
+.onLineMember-parent.panel {
+    padding: 0;
+    margin: -2px 0 0 0;
+    border: 2px solid #bce8f1;
+}
+
+.chatInfo-parent {
+    margin: -2px -1px 0 0;
+    border: 0;
+}
+
+#memberInfo ul {
+    line-height: 40px;
+    height: 40px;
+}
+
+#memberInfo ul li {
+    margin: -2px 0 0 0;
+    border: 2px solid #bce8f1;
+}
+
+.allMember-name {
+    margin-bottom: 0;
+}
+
+.allMember-name>div {
+    margin: -1px 0 0 0;
+    border: 1px solid #bce8f1;
+}
+
+.panel {
+    padding: 0 5px;
+}
+
+.page-header {
+    margin: 10px 0 0 0;
+}
+
+.btn-group {
+    margin-top: 20px;
+}
+
+.title-row {
+    margin: 0;
+}
+
+.member-list {
+    margin-bottom: 0;
+}
+
+.panel-body {
+    padding: 0;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+#allMember::-webkit-scrollbar {
+    display: none;
+}
+
+#chatInfo::-webkit-scrollbar {
+    display: none;
+}
+
+#onLineMember::-webkit-scrollbar {
+    display: none;
+}
+
+textarea {
+    border: 2px solid #bce8f1;
+    border-radius: 4px;
+    margin: -2px 0 0 0;
+    width: 1011px;
+    height: 164px;
+    outline: none;
+    /*禁止拖拽*/
+    resize:none;
+    font-size: 18px;
+}
+
+#submit_chatInfo {
+    position: absolute;
+    right: 50px;
+    bottom: 30px;
+}
+
+.user-all {
+    height: 60px;
+    width: 500px;
+}
+
+.right-user {
+    float: right;
+}
+
+.left-user {
+    float: left;
+}
+
+/*气泡框*/
+.tip {
+    height: fit-content;
+    width: fit-content;
+    line-height: 30px;
+    border-radius: 5px;
+    padding: 0 8px;
+    position: relative;
+    word-wrap:break-word;
+    word-break:break-all;
+}
+
+.tip-right {
+    float: right;
+    right: 60px;
+    background-color: #A3CB38;
+}
+
+.tip-left {
+    left: 50px;
+    background-color: #ff6348;
+}
+
+/*小箭头*/
+.tip-triangle {
+    width: 0;
+    height: 0;
+    border-width: 10px;
+    border-style: solid;
+    position: relative;
+}
+
+.tip-triangle-right {
+    left: 440px;
+    bottom: -5px;
+    border-color: transparent transparent transparent #A3CB38;
+}
+
+.tip-triangle-left {
+    left: 30px;
+    bottom: 25px;
+    display: inline-block;
+    border-color: transparent #ff6348 transparent transparent ;
+}
+
+/*头像*/
+.head-right {
+    left: 460px;
+    bottom: 20px;
+    position: relative;
+    display: block;
+}
+
+.head-left {
+    left: -20px;
+    bottom: 33px;
+    position: relative;
+}
+
+#group_chat_button {
+    margin-left: 20px;
+}
+
+/*群聊昵称*/
+.group_member {
+    font-size: 12px;
+    position: relative;
+}
+
+.group_member_left {
+    color: #ff6348;
+    left: 52px;
+}
+
+.group_member_right {
+    color: #A3CB38;
+    left: 390px;
+}

@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="chat_room">
+    <output-path>$PROJECT_DIR$/out/artifacts/chat_room</output-path>
+    <root id="archive" name="chat_room.war">
+      <element id="artifact" artifact-name="SnHI_SSM_CRUD:war exploded" />
+      <element id="dir-copy" path="$PROJECT_DIR$" />
+    </root>
+  </artifact>
+</component>
